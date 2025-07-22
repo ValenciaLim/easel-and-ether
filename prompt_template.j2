@@ -1,8 +1,10 @@
-Asset: {{ asset }}\nRecent market data: {{ market_data }}\n\nDescribe the current market narrative for this asset. Identify the narrative stage, dominant emotion, expected crowd behavior, and recommend a contrarian action. Respond in the following JSON format:\n{\n  "asset": "{{ asset }}",
-  "narrative_stage": "",
-  "emotion": "",
-  "expected_crowd_behavior": "",
-  "contrarian_action": "",
-  "confidence": 0.0,
-  "reason": ""
-}\n 
+Asset(s) under consideration: {{ asset }}
+Recent market data (painterly description): {{ market_data }}
+
+Analyze the market and recommend a trade. Respond in the following JSON format:
+{
+  "asset": "<asset-symbol>",
+  "action": "Buy|Sell|Hold",
+  "amount": <number>,
+  "reason": "<artistic, painterly explanation>"
+} 

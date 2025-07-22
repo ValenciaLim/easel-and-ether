@@ -1,85 +1,77 @@
-# Autonomous Apes: Narrative-Driven Crypto Trading Agent (Recall + Gaia)
+# Easel-and-Ether: Adaptive Visual-Metaphor Ethereum Trading Agent
 
 ## Overview
-This agent is designed for the Autonomous Apes trading competition on the Recall platform, and is built to qualify for the "Live Trading Agents built on Gaia" bounty.
+Easel-and-Ether is a fully adaptive, cross-asset trading agent for the Ethereum network. It combines:
+- **CoinGecko API**: Observes and compares top Ethereum-based assets (ERC-20 tokens) by price, volume, and volatility.
+- **Heuristic Scoring**: Selects the most visually compelling assets using price change, volume, and volatility.
+- **Gaia API**: Generates artistic, painterly reasoning and trade decisions using a custom prompt describing the Ethereum ecosystem.
+- **Recall API**: Executes trades in the Recall trading competition using assigned token addresses.
+- **Learning Layer (SQLite)**: Tracks trade outcomes and adapts strategy based on historical performance.
+- **Charting**: Generates chart snapshots for journal entries.
+- **Structured JSON Journal**: Logs every trade decision, reasoning, and outcome.
 
-**Key innovation:** Gaia is used as a creative, narrative-driven inference engine. The agent treats the market as a psychological story, and makes real trading decisions based on Gaia's structured, explainable output—not just as a chat interface.
-
----
-
-## How It Works
-
-1. **Every 5 minutes:**
-    - Pulls live market data (price, volume, etc.) for multiple assets from Recall's sandbox API.
-    - Sends a narrative-driven prompt (using a Jinja2 template) to Gaia, describing recent market behavior for each asset.
-    - Gaia responds with structured JSON, e.g.:
-      ```json
-      {
-        "asset": "ETH",
-        "narrative_stage": "bull trap",
-        "emotion": "euphoria",
-        "expected_crowd_behavior": "buy breakout",
-        "contrarian_action": "SELL",
-        "confidence": 0.84,
-        "reason": "Excessive optimism and price acceleration — likely reversal"
-      }
-      ```
-    - If Gaia's confidence is above a configurable threshold, the agent places a real trade using Recall's API.
-    - Every Gaia "thought" and trade is logged in structured JSON for transparency and explainability.
-    - The agent ensures at least 3 trades per day.
-
-2. **Creative Features:**
-    - Uses Gaia to detect market psychology and narrative tension.
-    - Dynamic asset selection: trades any asset Recall exposes (BTC, ETH, SOL, etc.).
-    - Contrarian bias: acts against the crowd at emotional turning points.
-    - Volatility + confidence filtering to reduce noise.
-    - All reasoning and actions are logged for auditability and bounty requirements.
-
----
-
-## Why This Qualifies for the Gaia Bounty
-
-- **Gaia is the core inference engine:**
-  - Gaia is not just a chat interface. Its structured, creative output directly determines the agent's trading actions.
-  - The agent is autonomous: it uses Gaia's reasoning to make real, live trading decisions.
-  - All trades are explainable and justified by Gaia's narrative/psychological analysis.
-
-- **Not just chat:**
-  - There is no user-facing chat loop. Gaia is used for inference, not conversation.
-  - The agent's loop is:
-    1. Pull market data
-    2. Send to Gaia for narrative inference
-    3. Parse Gaia's structured output
-    4. If confidence is high, execute a trade
-    5. Log all reasoning and actions
-
----
-
-## Example Agent Loop (Pseudocode)
-
-```python
-for each asset:
-    market_data = get_market_data()
-    gaia_decision = gaia.analyze_asset(asset, market_data)
-    if gaia_decision['confidence'] > threshold:
-        place_trade(gaia_decision['contrarian_action'])
-    log(gaia_decision, trade)
-```
-
----
+## High-Level Workflow
+1. **Observe**: Fetch top Ethereum assets from CoinGecko.
+2. **Score**: Rank assets by price change, volume, and volatility.
+3. **Describe**: Build a Gaia prompt summarizing the ecosystem and top assets in artistic language.
+4. **Infer**: Use Gaia to decide which asset to trade, action (buy/sell/hold), and amount.
+5. **Adapt**: Check learning layer stats; skip assets with poor historical performance.
+6. **Trade**: Map Gaia's asset to Recall token address and execute the trade via Recall API.
+7. **Log**: Record the trade in a structured JSON journal and the learning layer.
+8. **Repeat**: Loop on a schedule (asyncio-based).
 
 ## How to Run
-1. Install requirements: `pip install -r requirements.txt`
-2. Set up your `config.yaml` with Recall and Gaia API keys, tokens, and parameters.
-3. Run the agent: `python main.py`
+1. Install dependencies:
+   ```bash
+   pip install httpx pyyaml openai jinja2 matplotlib
+   ```
+   (sqlite3 is included with Python stdlib)
+
+2. Configure your `config.yaml` with Recall and Gaia API keys and scheduling/trade limits.
+
+3. Run the agent:
+   ```bash
+   python main.py
+   ```
+
+## Learning Layer
+- Trades are recorded in `logs/learning_layer.db` (SQLite).
+- Before each trade, the agent checks win rate and average return for the asset.
+- Assets with a win rate < 0.3 (if at least 5 trades) are skipped to avoid repeated losses.
+- You can query stats using the `learning_layer.py` functions, e.g.:
+  ```python
+  from learning_layer import get_asset_stats
+  print(get_asset_stats('LDO'))
+  ```
+
+## Example Journal Entry
+```json
+{
+  "timestamp": "2025-07-22T13:05Z",
+  "asset": "LDO",
+  "decision": "Buy 75 LDO",
+  "reasoning": "LDO's chart forms a rising spiral, like incense smoke climbing in still air. It leads the current market rhythm.",
+  "chart_snapshot": "ldo_2025-07-22.png",
+  "outcome": null,
+  "learning_stats": {"count": 7, "win_rate": 0.43, "avg_return": 0.02}
+}
+```
+
+## Dependencies
+- Python 3.8+
+- httpx
+- pyyaml
+- openai
+- jinja2
+- matplotlib
+- sqlite3 (stdlib)
+
+## Notes
+- The agent is designed for the Recall trading competition but can be adapted for other Ethereum trading environments.
+- Gaia is used strictly for inference, not chat.
+- All trades use contract addresses assigned by Recall (from `/agent/portfolio`).
+- The agent is fully async and can be scheduled with asyncio or APScheduler.
 
 ---
 
-## Customization
-- Edit `prompt_template.j2` to enhance the narrative/psychological flavor.
-- Adjust config parameters for trading frequency, thresholds, and asset selection.
-
----
-
-## Contact
-For questions or to discuss creative extensions, open an issue or contact the author. 
+For questions or further customization, open an issue or contact the maintainer. 

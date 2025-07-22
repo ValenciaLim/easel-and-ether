@@ -1,5 +1,7 @@
+requests
 aiohttp
-jinja2
 pyyaml
-openai
-httpx 
+matplotlib
+plotly
+websockets
+schedule 

@@ -74,4 +74,12 @@ class RecallSandboxClient:
         async with httpx.AsyncClient() as client:
             resp = await client.post(url, headers=self.headers, json=payload)
             resp.raise_for_status()
+            return resp.json()
+
+    async def get_portfolio(self):
+        # GET /agent/portfolio
+        url = f"{self.api_url}/agent/portfolio"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self.headers)
+            resp.raise_for_status()
             return resp.json() 
