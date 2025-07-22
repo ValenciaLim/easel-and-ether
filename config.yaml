@@ -1,0 +1,9 @@
+loop_interval_minutes: 5
+confidence_threshold: 0.7
+min_trades_per_day: 3
+gaia_url: 'https://YOUR-GAIA-DOMAIN.gaia.domains/v1'
+gaia_api_key: 'YOUR_API_KEY'
+gaia_model: 'llama'
+prompt_template: 'prompt_template.j2'
+recall_api_url: 'https://api.sandbox.recall.network/v1'
+recall_api_key: 'YOUR_RECALL_API_KEY' 
